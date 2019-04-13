@@ -4,8 +4,9 @@
 #include <task.h>
 
 #define PIN_LED_RED 12
-#define PIN_MOTOR_LEFT 6
-#define PIN_MOTOR_RIGHT 7
+#define PIN_BT_CONNECT 5
+#define PIN_MOTOR_LEFT 7
+#define PIN_MOTOR_RIGHT 6
 #define PIN_MOTOR_LEFT_BACK 10
 #define PIN_MOTOR_RIGHT_BACK 11
 #define PIN_CLOCK 9
@@ -13,36 +14,30 @@
 #define PIN_BUZZER 4
 #define STACK_SIZE 200
 
-const int c = 261;
-const int d = 294;
-const int e = 329;
-const int f = 349;
-const int g = 391;
-const int gS = 415;
-const int a = 440;
-const int aS = 455;
-const int b = 466;
-const int cH = 523;
-const int cSH = 554;
-const int dH = 587;
-const int dSH = 622;
-const int eH = 659;
-const int fH = 698;
-const int fSH = 740;
-const int gH = 784;
-const int gSH = 830;
-const int aH = 880;
+const int c = 2092;
+const int d = 2348;
+const int e = 2636;
+const int f = 2792;
+const int g = 3136;
+const int gS = 3320;
+const int a = 3520;
+//const int aS = 455;
+const int b = 3728;
+const int cH = 4184;
+//const int cSH = 554;
+//const int dH = 587;
+//const int dSH = 622;
+const int eH = 5272;
+const int fH = 5584;
+//const int fSH = 740;
+//const int gH = 784;
+//const int gSH = 830;
+//const int aH = 880;
 
 int counter;
+int played = 0;
 
-char blueToothValue;
-char dmb;
-
-void myDelay(int ms) {
-	for(int i=0;i<ms;i++) {
-		delayMicroseconds(1000);
-	}
-}
+char blueToothValue = 'h';
 
 void tMotorControl(void*p) {
 	for(;;){
@@ -71,13 +66,16 @@ void tMotorControl(void*p) {
 
 void tREDLED(void*p) {
 	for(;;) {
-		if (blueToothValue=='h') {
+		if (blueToothValue=='h' || blueToothValue=='a') {
+			if(blueToothValue=='a')digitalWrite(PIN_BT_CONNECT,HIGH);
 		    digitalWrite(PIN_LED_RED,HIGH);
 		    delay(250);
+		    if(blueToothValue=='a')digitalWrite(PIN_BT_CONNECT,LOW);
 		    digitalWrite(PIN_LED_RED,LOW);
 		    delay(250);
 		}
 		else {
+			digitalWrite(PIN_BT_CONNECT,LOW);
 		    digitalWrite(PIN_LED_RED,HIGH);
 		    delay(500);
 		    digitalWrite(PIN_LED_RED,LOW);
@@ -86,23 +84,32 @@ void tREDLED(void*p) {
 	}
 }
 
+
+
 void tGREENLED(void*p) {
 	for(;;) {
-		for(int i=0;i<8;i++) {
-        	shiftOut(PIN_DATA,PIN_CLOCK,MSBFIRST,B00000001 << i);
-    		delay(125);
-  		}
-  		for(int i=0;i<8;i++) {
-    		shiftOut(PIN_DATA,PIN_CLOCK,MSBFIRST,B10000000 >>i);
-    		delay(125);
-  		}
+		shiftOut(PIN_DATA,PIN_CLOCK,MSBFIRST,B11111111);
+		if(blueToothValue=='h'||blueToothValue=='a') {
+			shiftOut(PIN_DATA,PIN_CLOCK,MSBFIRST,B11111111);
+		}
+		else {
+			for(int i=0;i<8;i++) {
+				shiftOut(PIN_DATA,PIN_CLOCK,MSBFIRST,B00000001 << i);
+				delay(50);
+			}
+			for(int i=0;i<8;i++) {
+				shiftOut(PIN_DATA,PIN_CLOCK,MSBFIRST,B10000000 >>i);
+				delay(50);
+			}
+		}
 	}
 }
 
 void tSerial(void*p) {
 	for(;;) {
-		if(Serial.available())blueToothValue = Serial.read();
-		//if(!Serial.read()) digitalWrite(PIN_MOTOR_RIGHT,HIGH);
+		if(Serial.available()) {
+			blueToothValue = Serial.read();
+		}
 	}
 }
 
@@ -152,44 +159,40 @@ void scotlandTheBrave()
 }
 void babyShark()
 {
-  beep(d, 300);
-  beep(e, 200);
-  beep(g, 200);
-  beep(g, 200);
-  beep(g, 200);
-  beep(g, 200);
-  beep(g, 200);
-  beep(g, 200);
-  beep(g, 200);
-
-  delay(500);
-
-  beep(d, 300);
-  beep(e, 200);
-  beep(g, 200);
-  beep(g, 200);
-  beep(g, 200);
-  beep(g, 200);
-  beep(g, 200);
-  beep(g, 200);
-  beep(g, 200);
-
-  delay(500);
-
-  beep(d, 300);
-  beep(e, 200);
-  beep(g, 200);
-  beep(g, 200);
-  beep(g, 200);
-  beep(g, 200);
-  beep(g, 200);
-  beep(g, 200);
-  beep(g, 200);
-
-  delay(500);
-  beep(g, 300);
-  beep(g, 200);
-  beep(370, 200);
+	tone(PIN_BUZZER,d,1000);
+	delay(500);
+	    tone(PIN_BUZZER,e,1000);
+				     delay(500);
+				   for(int i=0;i<3;i++){
+				    if (i != 0){
+				       delay(250);
+				       tone(PIN_BUZZER,d,1000);
+				       delay(250);
+				       tone(PIN_BUZZER,e,1000);
+				       delay(250);
+				    }
+				      tone(PIN_BUZZER,g,100);
+				      delay(250);
+				       tone(PIN_BUZZER,g,100);
+				       delay(250);
+				       tone(PIN_BUZZER,g,100);
+				       delay(250);
+				       tone(PIN_BUZZER,g,100);
+				       delay(125);
+				       tone(PIN_BUZZER,g,100);
+				       delay(250);
+				       tone(PIN_BUZZER,g,100);
+				       delay(125);
+				       tone(PIN_BUZZER,g,100);
+				  }
+				   delay(300);
+				   tone(PIN_BUZZER,g,100);
+				   delay(300);
+				   tone(PIN_BUZZER,g,100);
+				   delay(300);
+				   tone(PIN_BUZZER,5929,100);
+				   delay(500);
+				  delay(1000);
 }
 
 void firstSection()
@@ -219,35 +222,22 @@ void firstSection()
   delay(500);
 }
 
-void secondSection()
-{
-  beep(aH, 500);
-  beep(a, 300);
-  beep(a, 150);
-  beep(aH, 500);
-  beep(gSH, 325);
-  beep(gH, 175);
-  beep(fSH, 125);
-  beep(fH, 125);
-  beep(fSH, 250);
 
-  delay(325);
-
-  beep(aS, 250);
-  beep(dSH, 500);
-  beep(dH, 325);
-  beep(cSH, 175);
-  beep(cH, 125);
-  beep(b, 125);
-  beep(cH, 250);
-
-  delay(350);
-}
 
 void tAudio(void*p) {
 	for(;;){
-		scotlandTheBrave();
-		delay(250);
+		if (blueToothValue=='a'){
+			firstSection();
+		}
+		if (blueToothValue=='b'){
+			scotlandTheBrave();
+			delay(250);
+		}
+		else if (blueToothValue>='d' && blueToothValue <= 'h' ){
+
+			babyShark();
+			delay(250);
+		}
 	}
 }
 
@@ -258,6 +248,7 @@ void setup() {
 	pinMode(PIN_MOTOR_RIGHT,OUTPUT);
 	pinMode(PIN_MOTOR_LEFT_BACK,OUTPUT);
 	pinMode(PIN_MOTOR_RIGHT_BACK,OUTPUT);
+	pinMode(PIN_BT_CONNECT,OUTPUT);
 	pinMode(PIN_CLOCK,OUTPUT);
 	pinMode(PIN_DATA,OUTPUT);
 	pinMode(PIN_BUZZER,OUTPUT);
