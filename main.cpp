@@ -34,11 +34,11 @@ const int fH = 5584;
 //const int gSH = 830;
 //const int aH = 880;
 
-int counter;
-int played = 0;
-int i = 0;
+
 char blueToothValue = 'h';
-char last_value;
+char  move = 0;
+char lastValue = 0;
+int i = 0;
 
 void tMotorControl(void*p) {
 	for(;;){
@@ -46,29 +46,37 @@ void tMotorControl(void*p) {
 			//forward
 		    digitalWrite(PIN_MOTOR_LEFT, HIGH);
 		    digitalWrite(PIN_MOTOR_RIGHT, HIGH);
-		    //digitalWrite(PIN_MOTOR_LEFT_BACK,LOW);
-		    //digitalWrite(PIN_MOTOR_RIGHT_BACK,LOW);
+		    digitalWrite(PIN_MOTOR_LEFT_BACK, LOW);
+		    digitalWrite(PIN_MOTOR_RIGHT_BACK, LOW);
+		    lastValue = 'd';
+		    move=0;
 		}
 		if (blueToothValue == 'e') {
 			//backward
-			//digitalWrite(PIN_MOTOR_LEFT,LOW);
-			//digitalWrite(PIN_MOTOR_RIGHT,LOW);
+			digitalWrite(PIN_MOTOR_LEFT, LOW);
+		    digitalWrite(PIN_MOTOR_RIGHT, LOW);
 		    digitalWrite(PIN_MOTOR_LEFT_BACK, HIGH);
 		    digitalWrite(PIN_MOTOR_RIGHT_BACK, HIGH);
+		    lastValue = 'e';
+		    move=0;
 		}
 		if (blueToothValue == 'f') {
 			//turn left
 		    digitalWrite(PIN_MOTOR_LEFT,HIGH);
-		    //digitalWrite(PIN_MOTOR_RIGHT,LOW);
-		    //digitalWrite(PIN_MOTOR_LEFT_BACK,LOW);
-		    //digitalWrite(PIN_MOTOR_RIGHT_BACK,LOW);
+		    digitalWrite(PIN_MOTOR_RIGHT, LOW);
+		    digitalWrite(PIN_MOTOR_LEFT_BACK, LOW);
+		    digitalWrite(PIN_MOTOR_RIGHT_BACK, LOW);
+		    if(lastValue == 'd'||lastValue=='e') move=lastValue;
+		    lastValue = 'f';
 		}
 		if (blueToothValue == 'g') {
 			//turn right
-			//digitalWrite(PIN_MOTOR_LEFT,LOW);
+			digitalWrite(PIN_MOTOR_LEFT, LOW);
 		    digitalWrite(PIN_MOTOR_RIGHT,HIGH);
-		    //digitalWrite(PIN_MOTOR_LEFT_BACK,LOW);
-		    //digitalWrite(PIN_MOTOR_RIGHT_BACK,LOW);
+		    digitalWrite(PIN_MOTOR_LEFT_BACK, LOW);
+		    digitalWrite(PIN_MOTOR_RIGHT_BACK, LOW);
+		    if(lastValue == 'd'||lastValue=='e') move=lastValue;
+		    lastValue = 'g';
 		}
 		if (blueToothValue == 'h') {
 			//release button
@@ -76,6 +84,9 @@ void tMotorControl(void*p) {
 		    digitalWrite(PIN_MOTOR_LEFT, LOW);
 		    digitalWrite(PIN_MOTOR_LEFT_BACK,LOW);
 		    digitalWrite(PIN_MOTOR_RIGHT_BACK,LOW);
+		    if(move!=0)
+		    	blueToothValue = move;
+		    lastValue='h';
 		  }
 	}
 }
@@ -133,7 +144,6 @@ void beep(int note, int duration)
     delay(duration);
     noTone(PIN_BUZZER);
     delay(25);
-    counter++;
 }
 
 void scotlandTheBrave()
