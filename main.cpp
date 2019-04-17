@@ -5,8 +5,8 @@
 
 #define PIN_LED_RED 12
 #define PIN_BT_CONNECT 5
-#define PIN_MOTOR_LEFT 7
-#define PIN_MOTOR_RIGHT 6
+#define PIN_MOTOR_LEFT 6
+#define PIN_MOTOR_RIGHT 7
 #define PIN_MOTOR_LEFT_BACK 10
 #define PIN_MOTOR_RIGHT_BACK 11
 #define PIN_CLOCK 9
@@ -36,28 +36,44 @@ const int fH = 5584;
 
 int counter;
 int played = 0;
-
+int i = 0;
 char blueToothValue = 'h';
+char last_value;
 
 void tMotorControl(void*p) {
 	for(;;){
 		if (blueToothValue == 'd') {
+			//forward
 		    digitalWrite(PIN_MOTOR_LEFT, HIGH);
 		    digitalWrite(PIN_MOTOR_RIGHT, HIGH);
+		    //digitalWrite(PIN_MOTOR_LEFT_BACK,LOW);
+		    //digitalWrite(PIN_MOTOR_RIGHT_BACK,LOW);
 		}
 		if (blueToothValue == 'e') {
+			//backward
+			//digitalWrite(PIN_MOTOR_LEFT,LOW);
+			//digitalWrite(PIN_MOTOR_RIGHT,LOW);
 		    digitalWrite(PIN_MOTOR_LEFT_BACK, HIGH);
 		    digitalWrite(PIN_MOTOR_RIGHT_BACK, HIGH);
 		}
 		if (blueToothValue == 'f') {
+			//turn left
 		    digitalWrite(PIN_MOTOR_LEFT,HIGH);
+		    //digitalWrite(PIN_MOTOR_RIGHT,LOW);
+		    //digitalWrite(PIN_MOTOR_LEFT_BACK,LOW);
+		    //digitalWrite(PIN_MOTOR_RIGHT_BACK,LOW);
 		}
 		if (blueToothValue == 'g') {
-		    digitalWrite(PIN_MOTOR_RIGHT, HIGH);
+			//turn right
+			//digitalWrite(PIN_MOTOR_LEFT,LOW);
+		    digitalWrite(PIN_MOTOR_RIGHT,HIGH);
+		    //digitalWrite(PIN_MOTOR_LEFT_BACK,LOW);
+		    //digitalWrite(PIN_MOTOR_RIGHT_BACK,LOW);
 		}
 		if (blueToothValue == 'h') {
+			//release button
+		    digitalWrite(PIN_MOTOR_RIGHT,LOW);
 		    digitalWrite(PIN_MOTOR_LEFT, LOW);
-		    digitalWrite(PIN_MOTOR_RIGHT, LOW);
 		    digitalWrite(PIN_MOTOR_LEFT_BACK,LOW);
 		    digitalWrite(PIN_MOTOR_RIGHT_BACK,LOW);
 		  }
@@ -84,22 +100,20 @@ void tREDLED(void*p) {
 	}
 }
 
-
-
 void tGREENLED(void*p) {
 	for(;;) {
 		shiftOut(PIN_DATA,PIN_CLOCK,MSBFIRST,B11111111);
-		if(blueToothValue=='h'||blueToothValue=='a') {
+		if(blueToothValue=='h'|| blueToothValue=='a'|| blueToothValue=='b') {
 			shiftOut(PIN_DATA,PIN_CLOCK,MSBFIRST,B11111111);
 		}
 		else {
 			for(int i=0;i<8;i++) {
 				shiftOut(PIN_DATA,PIN_CLOCK,MSBFIRST,B00000001 << i);
-				delay(50);
+				delay(10);
 			}
 			for(int i=0;i<8;i++) {
 				shiftOut(PIN_DATA,PIN_CLOCK,MSBFIRST,B10000000 >>i);
-				delay(50);
+				delay(10);
 			}
 		}
 	}
@@ -118,7 +132,7 @@ void beep(int note, int duration)
 	tone(PIN_BUZZER, note, duration);
     delay(duration);
     noTone(PIN_BUZZER);
-    delay(50);
+    delay(25);
     counter++;
 }
 
@@ -159,40 +173,45 @@ void scotlandTheBrave()
 }
 void babyShark()
 {
-	tone(PIN_BUZZER,d,1000);
-	delay(500);
-	    tone(PIN_BUZZER,e,1000);
-				     delay(500);
-				   for(int i=0;i<3;i++){
-				    if (i != 0){
-				       delay(250);
-				       tone(PIN_BUZZER,d,1000);
-				       delay(250);
-				       tone(PIN_BUZZER,e,1000);
-				       delay(250);
-				    }
-				      tone(PIN_BUZZER,g,100);
-				      delay(250);
-				       tone(PIN_BUZZER,g,100);
-				       delay(250);
-				       tone(PIN_BUZZER,g,100);
-				       delay(250);
-				       tone(PIN_BUZZER,g,100);
-				       delay(125);
-				       tone(PIN_BUZZER,g,100);
-				       delay(250);
-				       tone(PIN_BUZZER,g,100);
-				       delay(125);
-				       tone(PIN_BUZZER,g,100);
-				  }
-				   delay(300);
-				   tone(PIN_BUZZER,g,100);
-				   delay(300);
-				   tone(PIN_BUZZER,g,100);
-				   delay(300);
-				   tone(PIN_BUZZER,5929,100);
-				   delay(500);
-				  delay(1000);
+		if (i==0){
+		tone(PIN_BUZZER,d,1000);
+		delay(250);
+		tone(PIN_BUZZER,e,1000);
+		delay(250);
+		}
+	//for(int i=0;i<3;i++){
+		if (i != 0){
+			delay(125);
+		    tone(PIN_BUZZER,d,1000);
+		    delay(125);
+		    tone(PIN_BUZZER,e,1000);
+		    delay(125);
+		}
+		tone(PIN_BUZZER,g,100);
+		delay(125);
+		tone(PIN_BUZZER,g,100);
+		delay(125);
+		tone(PIN_BUZZER,g,100);
+		delay(125);
+		tone(PIN_BUZZER,g,100);
+		delay(63);
+		tone(PIN_BUZZER,g,100);
+		delay(125);
+		tone(PIN_BUZZER,g,100);
+		delay(63);
+		tone(PIN_BUZZER,g,100);
+	//}
+		if (i == 2 ){
+		delay(150);
+		tone(PIN_BUZZER,g,100);
+		delay(150);
+		tone(PIN_BUZZER,g,100);
+		delay(150);
+		tone(PIN_BUZZER,5929,100);
+		delay(250);
+		delay(500);
+		i = 0;
+		} else i++;
 }
 
 void firstSection()
@@ -221,8 +240,6 @@ void firstSection()
 
   delay(500);
 }
-
-
 
 void tAudio(void*p) {
 	for(;;){
